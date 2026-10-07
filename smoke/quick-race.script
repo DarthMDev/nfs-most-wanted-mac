@@ -1,0 +1,76 @@
+# quick-race.script - from boot, through the intro movies, past the title,
+# through creating a profile, to the main menu.
+#
+# Enter skips the intro movies and dismisses the title screen. The first run
+# asks whether to create an alias (a save profile); Enter takes the
+# highlighted answer, No, and the main menu follows. Each step is dumped so
+# the frames show where the game went.
+wait 20000
+dump intro
+key RETURN down
+wait 200
+key RETURN up
+wait 12000
+dump title
+key RETURN down
+wait 200
+key RETURN up
+wait 8000
+dump alias-question
+key RETURN down
+wait 200
+key RETURN up
+wait 8000
+dump main-menu
+key RIGHT down
+wait 200
+key RIGHT up
+wait 2000
+dump menu-right-1
+key RIGHT down
+wait 200
+key RIGHT up
+wait 2000
+dump menu-right-2
+key RETURN down
+wait 200
+key RETURN up
+wait 5000
+dump quick-race
+key RETURN down
+wait 200
+key RETURN up
+wait 5000
+dump race-mode
+key RETURN down
+wait 200
+key RETURN up
+wait 5000
+dump track-select
+key RETURN down
+wait 200
+key RETURN up
+wait 5000
+dump next-1
+key RETURN down
+wait 200
+key RETURN up
+wait 5000
+dump next-2
+key RETURN down
+wait 200
+key RETURN up
+wait 30000
+dump loading
+wait 30000
+dump race-1
+wait 20000
+dump race-2
+key UP down
+wait 10000
+dump race-3
+wait 10000
+dump race-4
+wait 10000
+dump race-5
+key UP up

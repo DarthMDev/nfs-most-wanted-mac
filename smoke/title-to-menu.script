@@ -1,0 +1,24 @@
+# title-to-menu.script - from boot, through the intro movies, past the title,
+# through creating a profile, to the main menu.
+#
+# Enter skips the intro movies and dismisses the title screen. The first run
+# asks whether to create an alias (a save profile); Enter takes the
+# highlighted answer, No, and the main menu follows. Each step is dumped so
+# the frames show where the game went.
+wait 20000
+dump intro
+key RETURN down
+wait 200
+key RETURN up
+wait 12000
+dump title
+key RETURN down
+wait 200
+key RETURN up
+wait 8000
+dump alias-question
+key RETURN down
+wait 200
+key RETURN up
+wait 8000
+dump main-menu

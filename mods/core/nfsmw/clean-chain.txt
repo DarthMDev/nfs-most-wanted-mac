@@ -1,0 +1,174 @@
+# clean-chain.txt
+# Clean-room Module D.1 calibration on the frozen Drop 2.2 A+B+C baseline.
+# Module A unchanged. Module B unchanged.
+# Module C keeps the same A + quartic-mean predictor and only refits its coefficients
+# to the exact in-game A/Q4 values measured in Drop 2.1.
+# Module D.1 appended below. Modules E/F intentionally absent.
+# E.3 revision: Module E (motion blur + cinematic DoF) is appended after D.1
+# (sections marked Module E.3; E.2 = calibration round after E.1, E.3 = in-car
+# follow-up after the E.2 eye check). Module F remains absent.
+# A-D lines are unchanged.
+
+effect clean-chain.fx
+
+# --- Module A: log-average luminance + temporal adaptation ---
+target Luma4    r32f frame/4
+target Luma16   r32f frame/16
+target Luma64   r32f frame/64
+target Luma128  r32f frame/128
+target LumaGrid r32f 4x4
+target LogMean  r32f 1x1
+history AdaptHistory r32f 1x1
+
+const LumaParams  0.0001,0,0,0
+# tau(scene darker), tau(scene brighter), black threshold, positive A floor
+const AdaptParams 0.95,0.42,0.0005,0.001
+
+# --- Module C: clean A + quartic-mean exposure predictor ---
+# Full-strength log-gain coefficients:
+#   logGainFull = x + y*A + z*Q4
+# strength w=0.50 gives the default fit.
+# Drop 2.2 refit basis: exact shader-side A and Q4 from the six fixed scenes.
+# No scene-specific terms and no change to the model form.
+const ExposureModel 1.27479958,-2.40261516,-1.12322615,0.50
+const ExposureClamp 0.50,2.00,0.001,0
+
+# Pixelwise fourth moment -> quartic mean Q4.
+target Q4_4      r32f frame/4
+target Q4_16     r32f frame/16
+target Q4_64     r32f frame/64
+target Q4_128    r32f frame/128
+target Q4Grid    r32f 4x4
+target Q4Moment  r32f 1x1
+
+# --- Module B: unchanged from Drop 2 ---
+const BloomParams     0.18,0.80,0.10,0.02
+const BloomBlurParams 0.0037037037,0,0,0
+target BloomBright argb8 frame/4
+target BloomH      argb8 frame/4
+target BloomV      argb8 frame/4
+
+# --- Module D.1: finish ---
+# One bounded clean-room black-box calibration round. A/B/C remain frozen.
+# FinishParams is dynamic host input in normal integration:
+#   x=hybrid_vignette, y=hybrid_shadows, z=PC effect-vignette amount, w=unused.
+# Neutral defaults preserve the frozen Drop 2.2 picture when D is off.
+const FinishParams 0.0,0.0,0.0,0.0
+
+# Original Module D shape retained for the PC-requested WHITE edge only.
+# This keeps the white-edge path unchanged while D.1 recalibrates vignette.
+const FinishShape       0.50,1.60,0.18,0.45
+
+# D.1 dark-vignette clean black-box fit:
+#   inner radius^2, outer radius^2, maximum attenuation, unused
+const FinishDarkShape   0.25,2.00,0.42,0.0
+
+# D.1 shadow-lift clean black-box fit:
+#   k, b, unused, unused
+#   f(x)=x+k*x*(1-x)^2/(x+b), with k scaled by hybrid_shadows.
+const FinishShadowShape 0.123,0.009,0.0,0.0
+
+# A+B+C writes here unchanged; D.1 then consumes that exact full-resolution result.
+target FinishInput argb8 frame
+
+# --- Module E.3: camera motion blur + cinematic depth of field ---
+# Host inputs set by the runner every frame (contract section 9), deliberately NOT
+# manifest consts: DepthInfo, nearFar, cameraVelocityVS, cameraFlags, CameraFocus,
+# MotionSettings. E keeps no history target (nothing to initialise after Reset).
+# This block uses 6 of the 16 global consts (16 of 16 in total); the E.3 in-car
+# values are per-pass constants on the clean_motion_dof pass line below.
+#
+# Motion: start speed m/s, saturation speed m/s, exposure s at 100% strength,
+#   maximum blur length in frame heights (absolute, not scaled by strength).
+#   E.2 [O]: exposure 0.05 -> 0.025 and cap 0.04 -> 0.02 (about half of E.1 at 100%).
+const EMotionParams 8.0,60.0,0.025,0.02
+# Full-coverage blur length px (E.2: 1 -> 3 px, keeps short blurs from softening the
+#   picture), projection P22 (60 deg vertical FOV default; P11 = P22*H/W),
+#   assumed depth m when depth is unavailable, cut-scene motion-blur multiplier (0 = off).
+const EMotionShape  3.0,1.7320508,16.0,0.0
+# Camera-rig suppression by view depth (m): chase views full<x none>y (in-car views use
+#   ERigCar.xy since E.3); chase view (in region) full<z none>w.
+const ERigDepth     1.2,2.0,7.0,10.0
+# Chase-view player-car ellipse in uv: centre x, centre y, radius x, radius y.
+const ERigRegion    0.50,0.65,0.32,0.38
+# DoF (unchanged): in-focus half-width (x DoF value), transition (x DoF value),
+#   unit scale to metres, blurred-copy step per blur pass in frame heights.
+const EDofParams    0.5,1.0,1.0,0.0055555556
+# E.2 [O] clear centre, chase views: r^2 clear (r=0.4 half-heights), r^2 full (r=1.1),
+#   view-point uv y, residual weight inside the clear zone (all views).
+const EMotionEdge   0.16,1.21,0.48,0.0
+
+# Blurred quarter-size copy of FinishInput (ping-pong; the final blur lands in EDofPing).
+target EDofPing argb8 frame/4
+target EDofPong argb8 frame/4
+
+# A1-A6
+pass clean_luma_log16 -> Luma4 s0=frame:point blend=off write=r
+pass clean_reduce16 -> Luma16   s0=Luma4:point    blend=off write=r
+pass clean_reduce16 -> Luma64   s0=Luma16:point   blend=off write=r
+pass clean_reduce16 -> Luma128  s0=Luma64:point   blend=off write=r
+pass clean_reduce16 -> LumaGrid s0=Luma128:point  blend=off write=r
+pass clean_reduce16 -> LogMean  s0=LumaGrid:point blend=off write=r
+pass clean_adapt -> AdaptHistory.cur s0=LogMean:point s1=AdaptHistory.prev:point blend=off write=r
+
+# C1-C6: instantaneous quartic-luminance statistic.
+# The same scalar reducer is reused after the first pixelwise Y^4 pass.
+pass clean_luma_quartic16 -> Q4_4 s0=frame:point blend=off write=r
+pass clean_reduce16 -> Q4_16   s0=Q4_4:point    blend=off write=r
+pass clean_reduce16 -> Q4_64   s0=Q4_16:point   blend=off write=r
+pass clean_reduce16 -> Q4_128  s0=Q4_64:point   blend=off write=r
+pass clean_reduce16 -> Q4Grid  s0=Q4_128:point  blend=off write=r
+pass clean_reduce16 -> Q4Moment s0=Q4Grid:point blend=off write=r
+
+# B1-B3 unchanged.
+pass clean_bright -> BloomBright s0=frame:linear s1=AdaptHistory.cur:point blend=off write=rgba
+pass clean_blur_h -> BloomH s0=BloomBright:linear blend=off write=rgba
+pass clean_blur_v -> BloomV s0=BloomH:linear blend=off write=rgba
+
+# Final C + B composite.
+# s3 supplies the quartic moment; the shader takes the fourth root internally.
+pass clean_exposure_bloom -> FinishInput s0=frame:point s1=AdaptHistory.cur:point s2=BloomV:linear s3=Q4Moment:point blend=off write=rgba
+
+# Module D.1 final full-resolution finish. At FinishParams=(0,0,0,0), this is identity.
+pass clean_finish -> frame s0=FinishInput:point blend=off write=rgb
+
+# Module E.3 E1-E5: blurred quarter-size copy of the A+B+C result for DoF.
+# Reads only FinishInput; writes only E targets. Two separable Gaussian iterations.
+pass clean_dof_down -> EDofPing s0=FinishInput:linear blend=off write=rgba
+pass clean_dof_blur_h -> EDofPong s0=EDofPing:linear blend=off write=rgba
+pass clean_dof_blur_v -> EDofPing s0=EDofPong:linear blend=off write=rgba
+pass clean_dof_blur_h -> EDofPong s0=EDofPing:linear blend=off write=rgba
+pass clean_dof_blur_v -> EDofPing s0=EDofPong:linear blend=off write=rgba
+
+# Module E.3 E6: motion blur + DoF composite, LAST pass, alpha-blended over D.1's frame.
+# Shader alpha = E coverage (explicit alpha behaviour for this technique); RGB write mask
+# keeps the frame alpha. Coverage is exactly 0 when E is inactive -> frame == D.1 output.
+# Per-pass constants (E.3 [O], in-car views only, cameraFlags.y = 0):
+#   EMotionEdgeCar = r^2 clear (r=0.6, 50% larger than chase), r^2 full (r=1.8, gradual),
+#                    view-point uv y, ease-in amount (1 = smoothstep(t)*t, no visible ring)
+#   ERigCar        = in-car near suppression full<x m none>y m (keeps the hood sharp),
+#                    in-car strength multiplier, unused
+pass clean_motion_dof -> frame s0=FinishInput:linear s1=depth:point s2=EDofPing:linear blend=alpha write=rgb EMotionEdgeCar=0.36,3.24,0.48,1.0 ERigCar=3.5,5.5,0.85,0.0
+
+
+# D.1 acceptance (host-side; no A/B/C retuning):
+# 1) Six fixed scenes with D off: neutral identity vs frozen Drop 2.2.
+# 2) Daylight + gallery at vignette=100%, shadows=100%: report the same radial
+#    luma bins and centre tonal curve used in the Module D integration round.
+# 3) One tunnel-to-daylight transition: check highlights/clipping and deep blacks.
+# 4) One 20-reset/resource-stability run.
+# 5) One same-session 4K GPU measurement at most; if still below session noise,
+#    record unresolved-but-bounded and stop.
+# 6) PC white-edge path is unchanged by D.1; TEST-only forced z=0.5/1.0 results
+#    may be reported separately.
+
+# E.3 acceptance (host-side; A-D untouched):
+# 1) Neutral identity vs frozen D.1 (median ratio 1.0000) with MotionSettings=(0,0,..),
+#    and separately parked (speed below 8 m/s) with CameraFocus=(0,0) at defaults.
+# 2) 20 resets with flat resources (E adds 2 argb8 frame/4 targets, no history).
+# 3) Chase views at 100%: same picture as E.2 (per-pixel, same speed/scene if possible).
+# 4) Hood view at 100%: hood pixels identical to D.1; no visible ring; blur fades in
+#    gradually toward the sides. Bumper view: clear area about 50% larger than E.2.
+# 5) DoF via TEST override only, e.g. CameraFocus=(8,4) and (25,10), dof_strength 30% and 100%.
+# 6) Compiled PS_MotionDof size (total / mov / texture), cost at 1080p and 4K, F3 swap A/B.
+# 7) Eye check at 100% and at the 10% default, all four camera views.

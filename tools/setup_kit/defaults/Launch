@@ -1,0 +1,28 @@
+#!/bin/sh
+# Launcher of the native app: sets up the player's profile folder on first run and starts the game.
+set -eu
+app_bin=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+app_resources="$app_bin/../Resources"
+app_profile="${RECOMP_PROFILE_DIR:-$HOME/Library/Application Support/NFS Most Wanted Native}"
+mkdir -p "$app_profile/Logs"
+for setting in registry.json mod-settings.json NativeOptions.ini; do
+    if [ ! -e "$app_profile/$setting" ]; then
+        cp "$app_resources/Defaults/$setting" "$app_profile/$setting"
+    fi
+done
+# Test-only variables are never inherited by normal play.
+unset RECOMP_CORE_MODS_DIR RECOMP_MODS_DIR RECOMP_TEST_SCRIPTS
+export RECOMP_PROFILE_DIR="$app_profile"
+export RECOMP_REGISTRY="$app_profile/registry.json"
+export RECOMP_EXE="$app_resources/Game/speed.exe"
+export RECOMP_D3D9_SHADER_WARM_DIR="$app_profile/ShaderWarm"
+export RECOMP_HOST_PRESENT_PACING=duration
+export RECOMP_D3D9_SCALE=1
+app_stamp=$(date +%Y%m%d-%H%M%S)-$$
+if [ "${RECOMP_DIAGNOSTICS:-0}" = 1 ]; then
+    export RECOMP_FRAME_TIMINGS="$app_profile/Logs/$app_stamp-frames.csv"
+fi
+# Keep the ten newest logs.
+ls -1t "$app_profile/Logs"/*.log 2>/dev/null | tail -n +11 | while IFS= read -r old; do rm -f "$old"; done
+cd "$app_resources/Game"
+exec "$app_bin/SpeedRecomp" "$@" >"$app_profile/Logs/$app_stamp.log" 2>&1

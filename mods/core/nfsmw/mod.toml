@@ -1,0 +1,105 @@
+# The game's own settings that the original PC release fixed in code: the
+# engine's simulation rate and the rendering resolution. What the community
+# widescreen fix (ThirteenAG, MIT) did with binary patches, done here with
+# hooks and data writes, because patched code bytes mean nothing to a
+# recompiled game. See NOTICE and docs/analysis.md.
+id = "core.nfsmw"
+name = "Most Wanted native controls, graphics and Extra Options"
+version = "1.0.0"
+api = 1
+game = "80774c2e5d619b4f120b48d4462896fd504c263399d203a238769cffde1d253c"
+requires = ["core.hooks >= 1.0.0"]
+affects_simulation = true
+
+[plugin]
+path = "nfsmw.dylib"
+
+[settings]
+quality = { type = "int", default = 4, min = 0, max = 4, apply = "renderer", choices = "Low|Medium|High|Ultra|Custom", label = "Detail level", group = "graphics", help = "How detailed the world looks. Higher looks better and works the computer harder." }
+msaa = { type = "int", default = -1, min = -1, max = 1, apply = "renderer", choices = "Game's setting|Off|4x MSAA", label = "Smooth edges (anti-aliasing)", group = "graphics", help = "Removes jagged, stair-step edges. 4x MSAA looks smoothest and costs a little speed." }
+widescreen = { type = "bool", default = true, apply = "restart", label = "Widescreen", group = "graphics", help = "Fills a wide screen instead of a square-ish picture with black bars. Leave on. Takes effect after a restart." }
+width = { type = "int", default = 0, min = 0, max = 16384, apply = "restart", label = "Picture width (0 = auto)", group = "graphics", help = "The width of the picture in pixels. 0 matches your screen automatically, which is best. Restart to apply." }
+height = { type = "int", default = 0, min = 0, max = 16384, apply = "restart", label = "Picture height (0 = auto)", group = "graphics", help = "The height of the picture in pixels. 0 matches your screen automatically, which is best. Restart to apply." }
+fov_scaling = { type = "int", default = 1, min = 0, max = 2, choices = "Original|Wider|Exact", apply = "restart", label = "How much you see to the sides", group = "graphics", help = "Original: the PC game. Wider: a little more to the sides. Exact: matched to your screen shape. Restart to apply." }
+fe_scale = { type = "int", default = 100, min = 50, max = 150, apply = "restart", label = "Menu size %", group = "graphics", help = "Makes the game's menus bigger or smaller. 100 is normal. Restart to apply." }
+hdr_output = { type = "bool", default = false, apply = "live", label = "HDR (for HDR TVs)", group = "graphics", help = "On an HDR TV, lets bright things like the sun, lights and chrome shine brighter than normal white. Leave off on a normal screen." }
+hdr_highlights = { type = "int", default = 60, min = 0, max = 100, step = 10, apply = "live", label = "HDR: how bright highlights get %", group = "graphics", help = "Only with HDR on. How much brighter the brightest things get. Higher is punchier." }
+hdr_refresh_60 = { type = "bool", default = true, apply = "live", label = "HDR: run at 60 Hz", group = "graphics", help = "Only with HDR on. Keeps the TV at 60 Hz, which avoids sparkles on some TVs. Turn off if your TV is fine at 120 Hz." }
+appearance = { type = "int", default = 0, min = 0, max = 3, apply = "renderer", choices = "Definitive (default)||PC - Original (texture pack and light pools at next launch)|Definitive - Custom", label = "Overall look", group = "graphics.appearance", help = "Definitive: the cleaner, console-inspired look this port is built around. PC - Original: the PC game exactly as it was. Custom: Definitive with your own changes below." }
+clean_effects = { type = "bool", default = true, apply = "live", label = "Rebuilt effects", group = "graphics.appearance", help = "The glow, auto brightness, edge darkening, motion blur and depth of field. Off shows the plain picture." }
+hybrid_exposure = { type = "int", default = 50, min = 0, max = 100, step = 10, apply = "live", label = "Auto brightness %", group = "graphics.appearance", help = "Like your eyes adjusting: tunnels get a bit brighter and bright daylight a bit darker. 0 turns it off." }
+hybrid_vignette = { type = "int", default = 0, min = 0, max = 100, step = 25, apply = "live", label = "Darker screen edges %", group = "graphics.appearance", help = "Gently darkens the corners of the picture, like a camera lens. 0 is off." }
+hybrid_shadows = { type = "int", default = 0, min = 0, max = 100, step = 10, apply = "live", label = "Brighter shadows %", group = "graphics.appearance", help = "Lifts the darkest parts of the picture so you can see detail in shadows. Black stays black. 0 is off." }
+motion_blur = { type = "bool", default = true, apply = "live", label = "Motion blur", group = "graphics.appearance", help = "The picture streaks at the edges of the screen when you drive fast, for a sense of speed. The centre stays sharp." }
+motion_blur_strength = { type = "int", default = 10, min = 5, max = 100, step = 5, apply = "live", label = "Motion blur strength %", group = "graphics.appearance", help = "How strong the speed streaks are. 100 is full strength. Lower it if fast driving feels too blurry." }
+cinematic_dof = { type = "bool", default = true, apply = "live", label = "Movie-style background blur", group = "graphics.appearance", help = "In cut-scenes and race-start camera shots, things the camera is not looking at go soft, like in a film. Never while you drive." }
+dof_strength = { type = "int", default = 30, min = 5, max = 100, step = 5, apply = "live", label = "Background blur strength %", group = "graphics.appearance", help = "How soft the background gets in cut-scenes. 100 is full strength." }
+clean_pools = { type = "bool", default = true, apply = "restart", label = "Light pools from lamps", group = "graphics.appearance", help = "Street lamps and tunnel lights cast soft pools of light on the road and walls (built by the setup from your game). Restart to apply." }
+clean_pools_strength = { type = "int", default = 100, min = 0, max = 200, step = 10, apply = "live", label = "Light pools brightness %", group = "graphics.appearance", help = "How bright the light pools are. 100 is the tuned look, higher is brighter, 0 hides them." }
+xbox_particles = { type = "bool", default = true, apply = "restart", label = "Sparks and light trails", group = "graphics.appearance", help = "Sparks when you scrape walls, and light trails behind fast cars. Needs XenonEffects.tpk from the XenonEffects mod (the setup copies it). Restart to apply." }
+dof_scene_depth = { type = "bool", default = true, apply = "live", label = "Blur: use the scene's own depth (advanced)", group = "graphics.appearance", help = "Leave on. Lets motion blur and background blur know how far away things are, even when it rains." }
+mirror_hd = { type = "bool", default = true, apply = "restart", label = "Mirror: sharp HD picture", group = "visual", help = "Draws the rear-view mirror in high resolution instead of a blurry low-res picture. Restart to apply." }
+mirror_full_scenery = { type = "bool", default = true, apply = "live", label = "Mirror: show all scenery", group = "visual", help = "The mirror shows all the buildings and trees behind you, not a cut-down version." }
+mirror_shadows = { type = "bool", default = false, apply = "live", label = "Mirror: world shadows", group = "visual", help = "Shows shadows of buildings and trees in the mirror. Costs some speed." }
+mirror_car_shadows = { type = "bool", default = true, apply = "live", label = "Mirror: car shadows", group = "visual", help = "Cars behind you cast shadows in the mirror." }
+mirror_lights = { type = "bool", default = true, apply = "live", label = "Mirror: headlights and police lights", group = "visual", help = "Shows headlights and police light bars in the mirror." }
+mirror_props = { type = "bool", default = true, apply = "live", label = "Mirror: knocked-over objects", group = "visual", help = "Cones, signs and debris you knocked over also show in the mirror." }
+mirror_look_back = { type = "bool", default = false, apply = "live", label = "Mirror: keep it while looking back", group = "visual", help = "Keeps the mirror on screen when you use Look Back." }
+mirror_neutral_exposure = { type = "bool", default = true, apply = "live", label = "Mirror: keep sky detail", group = "visual", help = "Stops the sky in the mirror from washing out to white." }
+mirror_hdr = { type = "bool", default = true, apply = "live", label = "Mirror: HDR brightness", group = "visual", help = "With HDR on, bright lights in the mirror shine like the main picture." }
+mirror_bloom = { type = "bool", default = false, apply = "live", label = "Mirror: glow on lights", group = "visual", help = "Bright lights in the mirror glow softly." }
+rain_amount = { type = "int", default = 100, min = 0, max = 300, apply = "restart", label = "Rain: amount %", group = "visual", help = "How many raindrops there are. 100 is normal. Restart to apply." }
+rain_intensity = { type = "int", default = 45, min = 0, max = 100, apply = "restart", label = "Rain: visibility %", group = "visual", help = "How visible each raindrop is. Restart to apply." }
+rain_reflection = { type = "int", default = 100, min = 0, max = 300, apply = "restart", label = "Rain: wet road shine %", group = "visual", help = "How shiny and reflective wet roads look. Restart to apply." }
+rain_size = { type = "int", default = 100, min = 1, max = 500, apply = "restart", label = "Rain: drop size", group = "visual", help = "How big the raindrops are. 100 is normal. Restart to apply." }
+rain_speed = { type = "int", default = 300, min = 0, max = 1000, apply = "restart", label = "Rain: falling speed", group = "visual", help = "How fast the rain falls. Restart to apply." }
+rain_crossing = { type = "int", default = 200, min = 0, max = 1000, apply = "restart", label = "Rain: sideways drift", group = "visual", help = "How much the rain drifts sideways. Restart to apply." }
+rain_gravity = { type = "int", default = 35, min = 0, max = 100, apply = "restart", label = "Rain: heaviness", group = "visual", help = "How heavily the rain drops. Restart to apply." }
+force_car_lod = { type = "int", default = -1, min = -1, max = 4, apply = "restart", label = "Car detail: force level", group = "visual", help = "Forces one detail level for car models: -1 lets the game decide, 0 is the most detailed (from Extra Options). Restart to apply." }
+force_tire_lod = { type = "int", default = -1, min = -1, max = 3, apply = "restart", label = "Wheel detail: force level", group = "visual", help = "Forces one detail level for wheels: -1 lets the game decide, 0 is the most detailed (from Extra Options). Restart to apply." }
+freeze_camera_key = { type = "bool", default = false, apply = "restart", label = "Pause or F9 freezes the camera", group = "visual", help = "While driving, Pause/Break or F9 (Fn+F9 on a MacBook) freezes and unfreezes the camera, for screenshots and cinematic shots (from Extra Options). Restart to apply." }
+debug_camera = { type = "bool", default = false, apply = "restart", label = "Free camera (Backspace)", group = "visual", help = "While driving, Backspace switches to the game's free debug camera and back, for screenshots (from Extra Options). Restart to apply." }
+light_keys = { type = "bool", default = false, apply = "restart", label = "Light keys (H, O)", group = "visual", help = "While driving, H switches your headlights and O your police lights (on a police car) on and off (from Extra Options). Restart to apply." }
+hot_positions = { type = "bool", default = false, apply = "restart", label = "Save/load positions (Shift/Ctrl + 1-5)", group = "career", help = "While driving, Left Shift + 1-5 saves where you are and Left Ctrl + 1-5 jumps back there: the game's own hidden feature (from Extra Options). Restart to apply." }
+texture_pack = { type = "bool", default = true, apply = "restart", label = "Texture pack", group = "visual", help = "Uses a TexWizard texture pack installed in your game folder, such as the Xbox 360 Stuff Pack textures (the setup finds it). Restart to apply." }
+mod_lighting = { type = "bool", default = true, apply = "restart", label = "Remove the golden haze", group = "visual", help = "Removes the heavy gold/sepia colour grade, blur and bloom of the PC version, for a cleaner picture. Turn it off to bring the PC golden look back. Restart to apply." }
+mod_hq_preset = { type = "bool", default = true, apply = "game_video", label = "Better top detail presets", group = "visual", help = "Makes the game's highest detail presets use this port's higher quality settings." }
+preculler = { type = "bool", default = true, apply = "live", label = "Fast scenery hiding (leave on)", group = "visual", help = "The game's own trick for not drawing what you cannot see. Leave on for speed." }
+impact_rumble = { type = "int", default = 100, min = 0, max = 200, apply = "live", label = "Rumble: crashes %", group = "feedback", help = "How hard the controller shakes when you hit something. 0 turns it off." }
+surface_rumble = { type = "int", default = 100, min = 0, max = 200, apply = "live", label = "Rumble: driving %", group = "feedback", help = "Shaking from the road surface, wheelspin, nitrous and gear shifts. 0 turns it off." }
+rumble_floor = { type = "int", default = 1, min = 0, max = 10, apply = "live", label = "Rumble: ignore tiny shakes %", group = "feedback", help = "Very weak rumble below this is skipped, so the controller does not buzz constantly. 0 plays everything." }
+black_edition = { type = "bool", default = true, apply = "restart", label = "Black Edition extras", group = "career", help = "Adds the Black Edition cars, races and content. Restart to apply." }
+replay_blacklist = { type = "bool", default = true, apply = "restart", label = "Race beaten Blacklist rivals again", group = "career", help = "Lets you race Blacklist rivals you already beat. Restart to apply." }
+special_vinyls = { type = "bool", default = true, apply = "restart", label = "Special vinyls", group = "career", help = "Adds the special vinyls category in the paint shop. Restart to apply." }
+max_perf_shop = { type = "bool", default = true, apply = "restart", label = "Max performance button", group = "career", help = "Adds a button in the shop to buy all performance upgrades at once. Restart to apply." }
+marker_count = { type = "int", default = 6, min = 1, max = 6, apply = "restart", label = "Rival rewards to pick (of 6)", group = "career", help = "How many reward markers you get to pick after beating a Blacklist rival. Restart to apply." }
+long_profile_names = { type = "bool", default = true, apply = "restart", label = "Longer profile names", group = "career", help = "Allows profile names up to 15 characters. Restart to apply." }
+helicopter_bounty = { type = "bool", default = true, apply = "restart", label = "Helicopter takedown bounty", group = "career", help = "Taking down a police helicopter gives a 100,000 bounty and an announcement (a community fix)." }
+ug2_save_bonus = { type = "bool", default = true, apply = "new_career", label = "New career: $10,000 bonus", group = "career", help = "A new career starts with the $10,000 bonus the game gives for an Underground 2 save. Applies to new careers." }
+starting_cash = { type = "int", default = 0, min = 0, max = 100000000, step = 100000, unit = "$", apply = "new_career", label = "New career: extra starting cash", group = "career", help = "Extra money at the start of a new career. Applies to new careers." }
+skip_track_anywhere = { type = "bool", default = true, apply = "restart", label = "Skip music track while driving", group = "career", help = "The skip-track key (T, or L3 on a controller) works while driving too, not only in the menus (from Extra Options). Restart to apply." }
+unlock_all = { type = "bool", default = false, apply = "restart", label = "Unlock everything", group = "career", help = "Unlocks all cars, parts, events and areas, and lets you play hidden tracks (from Extra Options). Restart to apply." }
+remove_neon_barriers = { type = "bool", default = false, apply = "restart", label = "Remove glowing barriers", group = "career", help = "Removes the glowing barriers that close off locked areas and routes (from Extra Options). Restart to apply." }
+remove_old_bridge_barrier = { type = "bool", default = false, apply = "restart", label = "Open the Old Bridge", group = "career", help = "Removes the barrier that closes the road to the Old Bridge (from Extra Options). Restart to apply." }
+heat_level_override = { type = "bool", default = false, apply = "next_screen", label = "Choose police heat levels", group = "career", help = "On: police heat stays between the two levels below. Heat 6-10 send up to 8 police cars, like heat 5 (the game's own settings for those levels are leftovers)." }
+heat_level_min = { type = "int", default = 1, min = 1, max = 10, apply = "next_screen", label = "Heat level: lowest", group = "career", help = "The lowest police heat level when 'Choose police heat levels' is on." }
+heat_level_max = { type = "int", default = 10, min = 1, max = 10, apply = "next_screen", label = "Heat level: highest", group = "career", help = "The highest police heat level when 'Choose police heat levels' is on." }
+surround_audio = { type = "bool", default = false, apply = "next_screen", label = "5.1 surround sound", group = "audio", help = "Sends 5.1 surround sound to your speakers or receiver." }
+audio_dolby_digital = { type = "bool", default = false, apply = "next_screen", label = "Dolby Digital (for TVs and receivers)", group = "audio", help = "Sends surround as Dolby Digital over HDMI. Use this if 5.1 sound comes out of the wrong speakers." }
+audio_center_lfe_swap = { type = "bool", default = false, apply = "next_screen", label = "Fix swapped centre/subwoofer", group = "audio", help = "Swaps the centre and subwoofer channels, for setups that mix them up." }
+movie_fit = { type = "bool", default = true, apply = "next_screen", label = "Fit movies to the screen", group = "fixes", help = "Shows the full widescreen movies without cutting off the sides." }
+skip_movies = { type = "bool", default = false , apply = "restart", label = "Skip intro movies", help = "Skips the movies (logos and story videos). Restart to apply." }
+skip_nis = { type = "bool", default = false , apply = "restart", label = "Skip cut-scenes", help = "Skips the in-game cut-scenes. Restart to apply." }
+position_log = { type = "bool", default = false, apply = "live", label = "Log my position", group = "diagnostics", help = "Writes where you are to the log, so you can report a spot to fix." }
+memory_log = { type = "bool", default = true, apply = "live", label = "Log memory use", group = "diagnostics", help = "Writes the game's memory use to the log once a minute." }
+scenery_trace = { type = "bool", default = false, apply = "restart", label = "Log scenery pop-in", group = "diagnostics", help = "Writes scenery pop-in and flicker to the log, for bug reports. Restart to apply." }
+input_trace = { type = "bool", default = false, apply = "live", label = "Log controller input", group = "diagnostics", help = "Writes controller and keyboard input to the log, for bug reports." }
+sim_rate = { type = "int", default = 60, min = 30, max = 480, apply = "restart", label = "Game speed (keep 60)", group = "diagnostics", help = "How many times a second the game updates. Keep it at 60. Restart to apply." }
+ps2_controls = { type = "bool", default = true, apply = "live", label = "PlayStation-style buttons", group = "controls", help = "Cross accelerates and Triangle goes back, like the PlayStation version." }
+trigger_pedals = { type = "bool", default = false, apply = "live", label = "Triggers as pedals", group = "controls", help = "R2 accelerates and L2 brakes, like most modern racing games." }
+l3_skip_track = { type = "bool", default = true, apply = "live", label = "L3 skips music track", group = "controls", help = "Clicking the left stick skips to the next music track, like the T key." }
+ps_icons = { type = "bool", default = true, apply = "restart", label = "PlayStation button icons", group = "controls", help = "Shows PlayStation button symbols in the menus. Restart to apply." }
+shift_up = { type = "int", default = 7, min = -1, max = 11, apply = "live", label = "Shift up button", group = "controls", help = "Controller button for shifting up (manual gears). -1 turns it off. 7 is R2. See the guide for other numbers." }
+shift_down = { type = "int", default = 6, min = -1, max = 11, apply = "live", label = "Shift down button", group = "controls", help = "Controller button for shifting down (manual gears). -1 turns it off. 6 is L2. See the guide for other numbers." }
+shift_up_secondary = { type = "int", default = -1, min = -1, max = 11, apply = "live", label = "Shift up: second button", group = "controls", help = "An extra button for shifting up. -1 turns it off." }
+shift_down_secondary = { type = "int", default = -1, min = -1, max = 11, apply = "live", label = "Shift down: second button", group = "controls", help = "An extra button for shifting down. -1 turns it off." }

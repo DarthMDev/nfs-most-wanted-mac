@@ -1,0 +1,113 @@
+Need for Speed: Most Wanted is the original game represented by this project.
+Original game names, executable code, artwork, audio, tracks, cinematics and
+other data retain their original ownership and notices. Original in-game credits
+are preserved. This project is not affiliated with or endorsed by the original
+game's publishers.
+
+The configuration, tests, tools and documentation in this repository are covered
+by LICENSE. The native host, compatibility runtime and translator are recomp-kit
+by veritr1x, included in kit/ with this port's changes, under its own LICENSE and
+NOTICE.
+
+Original game files are not distributed in this repository and are not relicensed
+by its MIT license. A translation of speed.exe is generated locally under
+ignored build/ from the player's own copy by the kit's tools; nothing generated is tracked, and the
+translation claims nothing over the original work's behaviour or ownership. The
+game's executable, data, artwork, audio, tracks and cinematics are still required
+from the player's own copy and are never included.
+
+Ghidra, Capstone, pefile, Unicorn, NumPy and Pillow are external development
+tools with their own licenses, not original game dependencies at runtime. The
+kit's NOTICE lists the components it links (Lua, TinySoundFont, SDL3, volk, the
+Vulkan headers) and their licenses.
+
+Windows-only components a game folder may contain (an ASI loader such as dinput8.dll, scripts/ with ASI mods) are
+not part of the port and are left out of every app the setup packages. They retain their own ownership and licenses.
+
+The engine-rate and resolution patch points in mods/core/nfsmw (the
+simulation frame time, its readers, and the resolution getters) follow the
+analysis in ThirteenAG's WidescreenFixesPack, NFSMostWanted.WidescreenFix,
+MIT License, Copyright (c) 2018 ThirteenAG. No code from it is included;
+the addresses were checked against this executable.
+
+Native Extra Options (weather and cinematic settings, Black Edition content, replayable Blacklist rivals, special
+vinyls, the max-performance shop button, reward markers, longer profile names, starting cash, heat levels and the
+helicopter takedown bounty) follow the behaviour of ExOptsTeam/NFSMWExOpts, commit
+8a094fe29d28195bdcf69122dbfe945f16315f9a (GPL-3.0). They are reimplemented natively against verified PC binary
+values; no code from it is included, and the Windows ASI and its instruction patches are not bundled.
+
+The rear-view mirror improvements (HD resolution, full scenery, vehicle lights, props and shadows in the mirror)
+restore what the community HD Reflections mod restores, reimplemented natively against the PC executable; no code
+from it is included.
+
+The texture-pack loader (mods/core/nfsmw/texture_pack.h) reads the TexWizard pack format; its engine entry points
+were taken as leads from the TexWizard project (R-033/texwizard, MW_Address.h) and verified against this executable.
+No code from it is included. Texture packs (for example the community "Need for Speed Most Wanted (2005) - Xbox 360
+Stuff Pack") are the player's own downloads; none is included, and only their texture files are used.
+
+Camera field names used by the depth of field and motion blur host inputs follow public reverse-engineering notes
+(dbalatoni's Most Wanted camera structures) and were checked against the PC executable.
+
+The rebuilt post-process effects (effects/clean-chain.hlsl) and light pools (effects/clean-pools.hlsl,
+effects/lamp-classes.toml) were written for this port from a functional description of the standard HDR technique
+and tuned against the PC game's own picture. They contain no console code or data. The light pools' lights and
+shading are built at setup time from the player's own PC game files and are never distributed.
+
+The setup kit downloads, into its own cache and checked against pinned SHA-256 hashes: Ghidra 12.1.3 (Apache 2.0,
+National Security Agency), an OpenJDK 26.0.1 build (GPL-2.0 with the Classpath Exception) and, only when the Mac has
+no Python 3.11 or later, a python-build-standalone CPython 3.12 build (PSF licence and its bundled licences).
+
+Native PlayStation menu prompt adaptation (mods/core/nfsmw/frontend_pad.h) uses
+structure, flag and resource-hash research from NFS-XtendedInput, commit
+60958fc1928308023457e3ae94a2f3e79cf3c9b5. Its MIT notice follows:
+
+MIT License
+
+Copyright (c) 2022–2023 Lovro Pleše
+Copyright (c) 2023 Berkay Yiğit <mail@berkay.link>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+The sparks and light trails (mods/core/nfsmw/xenon_particles.h, xenon_fx.h) reimplement
+the behaviour of NFSMW_XenonEffects by xan1242, commit
+b5070080c75a7dfc555deca0a5e005311954dbfd, checked against its routines under
+emulation; its hook points and attribute keys target this executable. Its
+texture pack is not bundled with the source. Its MIT notice follows:
+
+MIT License
+
+Copyright (c) 2023 Lovro Pleše
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

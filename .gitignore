@@ -1,0 +1,54 @@
+# Everything made from your own game files stays local.
+/original/
+/analysis/
+/build/
+/dist/
+/.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# Files the setup builds from your game (it writes them to build/generated; never commit copies):
+mods/core/nfsmw/clean-pools.bin
+mods/core/nfsmw/clean-world.fx
+mods/core/nfsmw/clean-worldreflect.fx
+mods/core/nfsmw/texture-pack.map
+mods/core/nfsmw/xenon/
+# Game and build file types never belong in the repository.
+CMakeUserPresets.json
+/.tools/
+/.pytest_cache/
+*.o
+*.a
+*.dylib
+*.dSYM/
+*.app/
+*.exe
+*.dll
+*.zip
+*.rar
+*.pack
+*.sf2
+# The kit's free General MIDI SoundFont (GeneralUser GS, see its LICENSE) is part of the kit.
+!kit/third_party/soundfonts/generaluser-gs/GeneralUser-GS.sf2
+*.log
+.env
+.env.*
+*.pem
+*.key
+*.bin
+*.dat
+*.popt
+*.so
+*.wav
+*.mp3
+*.mpg
+*.mp4
+*.smk
+*.bik
+*.vp6
+*.big
+*.bun
+*.lzc
+*.mus
+*.tpk
+*.asi
