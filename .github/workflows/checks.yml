@@ -35,3 +35,10 @@ jobs:
           .venv/bin/python tools/setup_kit/settings_doc.py --check
       - name: Core mod compiles
         run: clang -fsyntax-only -std=gnu11 -D_GNU_SOURCE -Ikit/mods mods/core/nfsmw/nfsmw.c
+      - name: Setup app builds
+        run: sh tools/installer/build_installer.sh "ci-${GITHUB_SHA::7}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: setup-app
+          path: dist/NFS-Most-Wanted-Native-Setup-*.dmg
+          retention-days: 14
